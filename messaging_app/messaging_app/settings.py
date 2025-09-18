@@ -51,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "rest_framework.permissions.IsAuthenticated",
     
 ]
 
@@ -127,6 +128,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEFAULT_AUTHENTICATION_CLASSES = [
-    "rest_framework.authentication.TokenAuthentication",
+    
     "rest_framework.authentication.SessionAuthentication",
 ]
