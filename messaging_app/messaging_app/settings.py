@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "chats",
     "rest_framework",
     "corsheaders",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "rest_framework.authentication.SessionAuthentication",
+    "rest_framework.permissions.IsAuthenticated",
 ]
 
 ROOT_URLCONF = "messaging_app.urls"
