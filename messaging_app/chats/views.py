@@ -5,11 +5,14 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
+from rest_framework import filters
 User = get_user_model()
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     seralizer_class = ConversationSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["participants__username"] 
 
     def create (self, request, *args, **kwargs):
         participants_id = request.data.get('participants', [])
