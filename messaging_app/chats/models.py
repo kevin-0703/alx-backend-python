@@ -16,6 +16,7 @@ class User(AbstractUser):
   email = models.EmailField(unique=True, null=False, db_index=True)
   phone_number = models.CharField(max_length=128, null=False)
   role = models.CharField(max_length=10, choices=ROLES, default='guest')
+  password = models.CharField(max_length=128, null=False)
   created_at = models.DateTimeField(auto_now_add=True)
 
   def __str__(self):
