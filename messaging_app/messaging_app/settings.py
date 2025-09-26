@@ -136,3 +136,7 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = "chats.User"
+DEFAULT_AUTHENTICATION_CLASSES = (
+    'rest_framework.authentication.BasicAuthentication',
+    'rest_framework.authentication.SessionAuthentication',
+)
