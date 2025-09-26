@@ -6,11 +6,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
 from rest_framework import filters
+from .permissions import IsParticipantOfConversation
 User = get_user_model()
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     seralizer_class = ConversationSerializer
+    permission_classes = [IsParticipantOfConversation]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["participants__username"] 
 
@@ -30,6 +32,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsParticipantOfConversation]
     def create (self, request, *args, **kwargs):
         sender_id = request.data.get('sender_id')
         message_body = request.data.get('message_body')
