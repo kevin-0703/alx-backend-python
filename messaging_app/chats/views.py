@@ -9,6 +9,7 @@ from rest_framework import filters
 from .permissions import IsParticipantOfConversation
 from rest_framework import permissions
 from rest_framework.pagination import PageNumberPagination
+from .pagination import MessagePagination
 User = get_user_model()
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -33,11 +34,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
         conversation.participants.set(participants)
         serializer = self.get_serializer(conversation)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-class MessagePagination(PageNumberPagination):
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
 class MessageFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
