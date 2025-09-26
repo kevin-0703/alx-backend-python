@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import filters
 from .permissions import IsParticipantOfConversation
 from rest_framework import permissions
+from rest_framework.pagination import PageNumberPagination
 User = get_user_model()
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -33,11 +34,25 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(conversation)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class MessagePagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class MessageFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        conversation_id = request.query_params.get('conversation_id')
+        if conversation_id:
+            queryset = queryset.filter(conversation__id=conversation_id)
+        return queryset
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
-
+    pagination_class = MessagePagination
+    filter_backends = [MessageFilterBackend, filters.OrderingFilter]
+    
     def get_queryset(self):
         return Message.objects.filter(conversation_participants=self.request.user)
     def create (self, request, *args, **kwargs):
