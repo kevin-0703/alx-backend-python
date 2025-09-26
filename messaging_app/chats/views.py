@@ -7,14 +7,18 @@ from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
 from rest_framework import filters
 from .permissions import IsParticipantOfConversation
+from rest_framework import permissions
 User = get_user_model()
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     seralizer_class = ConversationSerializer
-    permission_classes = [IsParticipantOfConversation]
+    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["participants__username"] 
+    search_fields = ["participants__username"]
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants=self.request.user) 
 
     def create (self, request, *args, **kwargs):
         participants_id = request.data.get('participants', [])
@@ -32,11 +36,22 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [IsParticipantOfConversation]
+    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
+
+    def get_queryset(self):
+        return Message.objects.filter(conversation_participants=self.request.user)
     def create (self, request, *args, **kwargs):
         sender_id = request.data.get('sender_id')
         message_body = request.data.get('message_body')
         conversation_id = request.data.get('conversation_id')
+        conversation = serializer.validated_data.get('conversation_id')
+
+        if self.request.user not in conversation.participants.all():
+            return Response (
+                {"detail": "You do not have permission to send messages in this conversation."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        serializer.save(sender_id=self.request.user)
 
         if not sender_id or message_body is None or not conversation_id:
             return Response({'error': 'sender_id, message_body and conversation_id are required.'}, status=status.HTTP_400_BAD_REQUEST)
