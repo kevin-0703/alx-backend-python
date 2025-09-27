@@ -66,3 +66,20 @@ class OffensiveLanguageMiddleware:
             ip = request.META.get('REMOTE_ADDR')
         return ip
     
+class RolepermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            if request.user.role == 'admin' or 'modurator':
+                return self.get_response(request)
+            else:
+                return JsonResponse (
+                    {'error': 'You do not have permission to access this resource.'}, 
+                    status=403
+                )
+        else:
+            return JsonResponse (
+                {'error': 'Authentication required.'}, 
+                status=401
+            )
