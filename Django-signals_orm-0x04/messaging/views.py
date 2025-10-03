@@ -15,6 +15,7 @@ def conversation_view(request, user_id):
        Message.objects.filter(receiver_id=user_id, sender=request.user)
        .select_related("sender", "receiver")
        .prefetch_related("replies")
+       .only("id", "content", "timestamp") 
     )
     return render(request, "conversation.html", {"messages": thread})
 
