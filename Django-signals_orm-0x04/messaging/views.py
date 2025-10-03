@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 # Create your views here.
 @cache_page(60)  # cache for 60 seconds
 def conversation_view(request, user_id):
+    sender = request.user
     messages = Message.objects.filter(receiver_id=user_id).select_related("sender")
     return render(request, "conversation.html", {"messages": messages})
 
