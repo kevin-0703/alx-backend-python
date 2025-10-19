@@ -1,0 +1,29 @@
+#!/bin/bash
+# kubctl-0x01
+# Scale Django messaging app deployment and monitor performance
+
+# Step 1: Scale the deployment to 3 replicas
+echo "Scaling the Django app to 3 replicas..."
+kubectl scale deployment messaging-app-deployment --replicas=3
+
+# Step 2: Verify that multiple pods are running
+echo "Verifying running pods..."
+kubectl get pods -l app=messaging-app
+
+# Step 3: Load test using wrk (make sure wrk is installed)
+# Assuming your service is exposed as ClusterIP (internal),
+# you can port-forward to access it locally for testing.
+echo "Starting port-forward for testing..."
+kubectl port-forward deployment/messaging-app-deployment 8000:8000 &
+sleep 5
+
+echo "Running load test with wrk for 30 seconds..."
+wrk -t4 -c100 -d30s http://127.0.0.1:8000/
+
+# Step 4: Monitor resource usage
+echo "Monitoring resource usage..."
+kubectl top pods
+
+# Cleanup port-forward background process
+echo "Stopping port-forward..."
+pkill -f "kubectl port-forward"
