@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Deploy Blue (current version)
+echo "Deploying BLUE version..."
+kubectl apply -f messaging_app/blue_deployment.yaml
+
+# Deploy Green (new version)
+echo "Deploying GREEN version..."
+kubectl apply -f messaging_app/green_deployment.yaml
+
+# Apply the shared service
+echo "Applying Service..."
+kubectl apply -f messaging_app/kubeservice.yaml
+
+# Wait a few seconds for pods to start
+echo "Waiting for pods to start..."
+sleep 10
+
+# Check pod status
+kubectl get pods -l app=messaging
+
+# View logs from the green version
+echo "Fetching logs from GREEN pods..."
+kubectl logs -l version=green --tail=10
