@@ -3,11 +3,16 @@ kind: Deployment
 metadata:
   name: messaging-blue
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: messaging
       version: blue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1 # ensures at least 2 pods stay up
+      maxSurge: 1 # allows 1 extra pod during update
   template:
     metadata:
       labels:
@@ -16,6 +21,6 @@ spec:
     spec:
       containers:
         - name: django-messaging
-          image: kevin/messaging-app:v1 # Use your current Docker image tag
+          image: kevin/messaging-app:v2.0 # Updated image version
           ports:
             - containerPort: 8000
