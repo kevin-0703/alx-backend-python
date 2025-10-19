@@ -1,0 +1,30 @@
+#!/bin/bash
+# kurbeScript - start a Kubernetes cluster and verify it’s running
+
+echo "Checking for Minikube installation..."
+if ! command -v minikube &> /dev/null
+then
+    echo "Minikube not found. Please install it first."
+    exit 1
+fi
+
+echo "Starting Minikube cluster..."
+minikube start
+
+if [ $? -ne 0 ]; then
+    echo "Failed to start Minikube cluster."
+    exit 1
+fi
+
+echo "Verifying Kubernetes cluster status..."
+kubectl cluster-info
+
+if [ $? -ne 0 ]; then
+    echo "Failed to connect to the cluster."
+    exit 1
+fi
+
+echo "Retrieving available pods..."
+kubectl get pods --all-namespaces
+
+echo "Kubernetes local cluster is up and running!"
