@@ -1,34 +1,47 @@
 pipeline {
     agent any
+
+    environment {
+        PYTHON = 'python3'
+        VENV = '.venv'
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/kevin-0703/alx-backend-python.git'
+                git credentialsId: 'github-credentials', url: 'https://github.com/YourUsername/alx-backend-python.git'
             }
         }
-        stage('Install Dependencies') {
+
+        stage('Install dependencies') {
             steps {
                 sh '''
-                cd messaging_app
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install -r requirements.txt
+                python3 -m venv ${VENV}
+                source ${VENV}/bin/activate
+                pip install --upgrade pip
+                pip install -r messaging_app/requirements.txt
                 '''
             }
         }
+
         stage('Run Tests') {
             steps {
                 sh '''
-                cd messaging_app
-                source venv/bin/activate
-                pytest --junitxml=test-results.xml
+                source ${VENV}/bin/activate
+                pytest messaging_app/tests --junitxml=report.xml
                 '''
             }
             post {
                 always {
-                    junit 'messaging_app/test-results.xml'
+                    junit 'report.xml'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
