@@ -9,23 +9,26 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/YourUsername/alx-backend-python.git'
+                echo 'Cloning repository from GitHub...'
+                git branch: 'main', credentialsId: 'kevin-0703', url: 'https://github.com/kevin-0703/alx-backend-python.git'
             }
         }
 
         stage('Install dependencies') {
             steps {
+                echo 'Setting up Python environment and installing dependencies...'
                 sh '''
-                python3 -m venv ${VENV}
+                ${PYTHON} -m venv ${VENV}
                 source ${VENV}/bin/activate
-                pip install --upgrade pip
-                pip install -r messaging_app/requirements.txt
+                pip3 install --upgrade pip
+                pip3 install -r messaging_app/requirements.txt
                 '''
             }
         }
 
         stage('Run Tests') {
             steps {
+                echo 'Running tests with pytest...'
                 sh '''
                 source ${VENV}/bin/activate
                 pytest messaging_app/tests --junitxml=report.xml
@@ -41,7 +44,7 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline finished.'
+            echo 'Pipeline completed successfully.'
         }
     }
 }
